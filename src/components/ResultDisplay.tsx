@@ -83,13 +83,10 @@ export function ResultDisplay({ result, productType, isLoading }: ResultDisplayP
           ) : (
             <p>
               剩余价值 = (剩余天数 × 日固定费用) + (剩余流量 × 流量单价)<br/>
-              = ({result.remainingDays} 天 × {formatCurrency(result.dailyFixedCost)}) +
+              ({result.remainingDays} 天 × {formatCurrency(result.dailyFixedCost)})
               {result.remainingTraffic && result.trafficUnitPrice &&
-                ` (${formatTraffic(result.remainingTraffic)} × ${formatCurrency(result.trafficUnitPrice)})`}<br/>
-              = {formatCurrency(result.remainingDays * result.dailyFixedCost)} +
-              {result.remainingTraffic && result.trafficUnitPrice &&
-                ` ${formatCurrency(result.remainingTraffic * result.trafficUnitPrice)}`}<br/>
-              = {formatCurrency(result.remainingValue)}
+                ` + (${formatTraffic(result.remainingTraffic)} × ${formatCurrency(result.trafficUnitPrice)})`}<br/>
+              计算过程详情 = {formatCurrency(result.remainingValue)}
             </p>
           )}
         </div>

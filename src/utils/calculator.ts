@@ -26,15 +26,19 @@ export function roundToTwoDecimal(value: number): number {
 function calculateMonthlyRemainingValue(input: ProductInput & { productType: 'monthly' }): CalculationResult {
   const { subscriptionPrice, subscriptionCycle, refundDate, subscriptionEndDate } = input;
 
-  // 计算日固定费用
+  // 计算日固定费用 - 使用最高精度计算
   const cycleDays = subscriptionCycle * DAYS_PER_MONTH;
-  const dailyFixedCost = roundToTwoDecimal(subscriptionPrice / cycleDays);
+  const dailyFixedCostRaw = subscriptionPrice / cycleDays;
 
   // 计算剩余天数
   const remainingDays = calculateDaysDifference(refundDate, subscriptionEndDate);
 
-  // 计算剩余价值
-  const remainingValue = roundToTwoDecimal(remainingDays * dailyFixedCost);
+  // 计算剩余价值 - 使用最高精度计算
+  const remainingValueRaw = remainingDays * dailyFixedCostRaw;
+
+  // 只在最终结果返回时进行四舍五入
+  const dailyFixedCost = roundToTwoDecimal(dailyFixedCostRaw);
+  const remainingValue = roundToTwoDecimal(remainingValueRaw);
 
   return {
     remainingValue,
@@ -56,12 +60,12 @@ function calculateYearlyRemainingValue(input: ProductInput & { productType: 'yea
     subscriptionEndDate
   } = input;
 
-  // 计算日固定费用
-  const dailyFixedCost = roundToTwoDecimal(fixedCost / DAYS_PER_YEAR);
+  // 计算日固定费用 - 使用最高精度计算
+  const dailyFixedCostRaw = fixedCost / DAYS_PER_YEAR;
 
-  // 计算流量费用和单价
+  // 计算流量费用和单价 - 使用最高精度计算
   const trafficFee = totalSubscriptionPrice - fixedCost;
-  const trafficUnitPrice = roundToTwoDecimal(trafficFee / totalTraffic);
+  const trafficUnitPriceRaw = trafficFee / totalTraffic;
 
   // 计算剩余流量
   const remainingTraffic = totalTraffic - usedTraffic;
@@ -70,9 +74,19 @@ function calculateYearlyRemainingValue(input: ProductInput & { productType: 'yea
   const remainingDays = calculateDaysDifference(refundDate, subscriptionEndDate);
 
   // 计算剩余价值 = (剩余天数 × 日固定费用) + (剩余流量 × 流量单价)
-  const timeBasedValue = roundToTwoDecimal(remainingDays * dailyFixedCost);
-  const trafficBasedValue = roundToTwoDecimal(remainingTraffic * trafficUnitPrice);
-  const remainingValue = roundToTwoDecimal(timeBasedValue + trafficBasedValue);
+  // 使用最高精度进行所有中间计算
+  const timeBasedValueRaw = remainingDays * dailyFixedCostRaw;
+  const trafficBasedValueRaw = remainingTraffic * trafficUnitPriceRaw;
+  const remainingValueRaw = timeBasedValueRaw + trafficBasedValueRaw;
+
+  // 只在最终结果返回时进行四舍五入
+  const dailyFixedCost = roundToTwoDecimal(dailyFixedCostRaw);
+  const trafficUnitPrice = roundToTwoDecimal(trafficUnitPriceRaw);
+  const remainingValue = roundToTwoDecimal(remainingValueRaw);
+
+  // 保留中间结果用于潜在的调试扩展（目前未使用但保留计算逻辑）
+  // const timeBasedValue = roundToTwoDecimal(timeBasedValueRaw);
+  // const trafficBasedValue = roundToTwoDecimal(trafficBasedValueRaw);
 
   return {
     remainingValue,
