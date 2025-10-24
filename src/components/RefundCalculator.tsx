@@ -62,9 +62,9 @@ export function RefundCalculator() {
         newErrors.usedTraffic = '已用流量不能为负数';
       }
 
-      if (data.totalTraffic && data.usedTraffic && data.usedTraffic > data.totalTraffic) {
-        newErrors.usedTraffic = '已用流量不能超过总流量';
-      }
+      // if (data.totalTraffic && data.usedTraffic && data.usedTraffic > data.totalTraffic) {
+      //   newErrors.usedTraffic = '已用流量不能超过总流量';
+      // }
 
       if (!data.refundDate) {
         newErrors.refundDate = '请选择退款日期';
